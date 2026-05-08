@@ -1,0 +1,303 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════
+   BASE LAYER
+   ═══════════════════════════════════════════════════════════ */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: #000005;
+    color: #E8E8F0;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background: rgba(124, 111, 255, 0.3);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid #7C6FFF;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1a1a36; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #7C6FFF; }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Satoshi', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COMPONENT LAYER
+   ═══════════════════════════════════════════════════════════ */
+@layer components {
+
+  /* ── Glass surfaces ─────────────────────────────────────── */
+  .glass {
+    background: rgba(8, 8, 26, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+  }
+
+  .glass-hover {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-hover:hover {
+    border-color: rgba(124, 111, 255, 0.15);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,111,255,0.08) inset;
+    transform: translateY(-3px);
+  }
+
+  /* ── Text gradients ─────────────────────────────────────── */
+  .text-gradient {
+    background: linear-gradient(135deg, #7C6FFF, #00D5BD);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-hero {
+    background: linear-gradient(180deg, #FFFFFF 0%, rgba(232,232,240,0.55) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Pulse ring (Huly-style) ────────────────────────────── */
+  .pulse-ring {
+    position: absolute;
+    border-radius: 9999px;
+    border: 1px solid rgba(124, 111, 255, 0.2);
+    animation: pulse-ring-expand 4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  @keyframes pulse-ring-expand {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+
+  /* ── Ambient glow backgrounds ───────────────────────────── */
+  .glow-violet {
+    position: relative;
+  }
+  .glow-violet::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(900px, 80vw);
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(124,111,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow-teal {
+    position: relative;
+  }
+  .glow-teal::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: min(600px, 60vw);
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(0,213,189,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Buttons ────────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 font-display font-semibold
+           bg-primary text-white transition-all duration-300;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.12);
+    box-shadow: 0 0 40px rgba(124,111,255,0.3);
+  }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 font-display font-semibold
+           bg-transparent text-text transition-all duration-300;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .btn-secondary:hover {
+    border-color: rgba(124,111,255,0.25);
+    background: rgba(124,111,255,0.05);
+  }
+  .btn-secondary:active { transform: scale(0.97); }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 font-body font-medium
+           text-muted bg-transparent transition-all duration-200;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .btn-ghost:hover {
+    color: #E8E8F0;
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ── Grid / dot overlay ─────────────────────────────────── */
+  .bg-grid {
+    background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* ── Mask utilities ─────────────────────────────────────── */
+  .mask-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  }
+  .mask-t {
+    -webkit-mask-image: linear-gradient(to top, black 50%, transparent 100%);
+    mask-image: linear-gradient(to top, black 50%, transparent 100%);
+  }
+
+  /* ── Shimmer line ───────────────────────────────────────── */
+  .shimmer-line {
+    background: linear-gradient(90deg, transparent 0%, rgba(124,111,255,0.15) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* ── Tag / chip ─────────────────────────────────────────── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #7C6FFF;
+    background: rgba(124,111,255,0.08);
+    border: 1px solid rgba(124,111,255,0.12);
+  }
+
+  /* ── Browser chrome frame ───────────────────────────────── */
+  .browser-frame {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+  }
+  .browser-chrome {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: #0a0a18;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .browser-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════ */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOW CARD — Godly Circuit pulse border on hover
+   ═══════════════════════════════════════════════════════════ */
+.glow-card {
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-color: rgba(91,140,255,0.7); /* Deep intense blue */
+  --glow-color-2: rgba(0,213,189,0.5); /* Vibrant teal */
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: transparent;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.glow-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(
+    800px circle at var(--glow-x) var(--glow-y),
+    var(--glow-color) 0%,
+    var(--glow-color-2) 30%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 0;
+}
+
+.glow-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 50px -10px rgba(91,140,255,0.25), 0 0 0 1px rgba(255,255,255,0.1) inset;
+}
+
+.glow-card:hover::before {
+  opacity: 1;
+}
+
+.glow-card > .glow-card-inner {
+  position: relative;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
