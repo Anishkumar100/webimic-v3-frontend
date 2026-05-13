@@ -1,0 +1,9 @@
+{
+	"id": "nBkpr2KuTTo4Rbg",
+	"json": "{\"id\":\"nBkpr2KuTTo4Rbg\",\"url\":\"https://anishkumardev.in\",\"loadedUrl\":\"https://www.anishkumardev.in/\",\"uniqueKey\":\"https://anishkumardev.in\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":1,\"errorMessages\":[\"page.screenshot: Timeout 30000ms exceeded.\\nCall log:\\n\\u001b[2m  - taking page screenshot\\u001b[22m\\n\\n    at PlaywrightCrawler.requestHandler (C:\\\\Users\\\\akcod\\\\Downloads\\\\webimic-v3\\\\server\\\\workers\\\\crawler.js:49:43)\\n    at async wrap (C:\\\\Users\\\\akcod\\\\Downloads\\\\webimic-v3\\\\server\\\\node_modules\\\\@apify\\\\timeout\\\\cjs\\\\index.cjs:54:21)\"],\"headers\":{},\"userData\":{\"__crawlee\":{\"state\":5}}}",
+	"method": "GET",
+	"orderNo": 1778519668215,
+	"retryCount": 1,
+	"uniqueKey": "https://anishkumardev.in",
+	"url": "https://anishkumardev.in"
+}

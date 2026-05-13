@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doc A — Observed Design Specification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000008;
+      color: #FAFAFA;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      line-height: 1.5;
+    }
+
+    /* ─── Typography Helpers ───────────────────────────────────── */
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0 0 8px;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 12px;
+    }
+
+    h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: #C8CCD4;
+    }
+
+    code,
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── Surface / Card ───────────────────────────────────────── */
+    .surface {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      transition: border-color 0.2s;
+    }
+
+    .surface:hover {
+      border-color: rgba(255, 255, 255, 0.13);
+    }
+
+    /* ─── Section Title ────────────────────────────────────────── */
+    .section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #7C6FFF;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(124, 111, 255, 0.2);
+    }
+
+    /* ─── Badges / Pills ───────────────────────────────────────── */
+    .subtle {
+      color: #8A8F98;
+    }
+
+    .tag-chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+
+    .pill-ok {
+      background: rgba(0, 213, 189, 0.12);
+      color: #00D5BD;
+    }
+
+    .pill-warn {
+      background: rgba(245, 158, 11, 0.12);
+      color: #F59E0B;
+    }
+
+    .pill-fail {
+      background: rgba(255, 95, 87, 0.12);
+      color: #FF5F57;
+    }
+
+    /* ─── Tables ───────────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 10px;
+      color: #8A8F98;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: sticky;
+      top: 0;
+      background: #000008;
+      z-index: 1;
+    }
+
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: top;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ─── Color Grid (3-col) ───────────────────────────────────── */
+    .colors-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .swatch {
+      width: 100%;
+      height: 56px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.15s;
+    }
+
+    .swatch:hover {
+      transform: scale(1.04);
+    }
+
+    /* ─── Code Blocks ──────────────────────────────────────────── */
+    .code-wrap {
+      position: relative;
+    }
+
+    pre {
+      background: rgba(124, 111, 255, 0.05);
+      border: 1px solid rgba(124, 111, 255, 0.15);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 11px;
+      line-height: 1.7;
+      color: #C8CCD4;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(124, 111, 255, 0.15);
+      border: 1px solid rgba(124, 111, 255, 0.3);
+      color: #7C6FFF;
+      border-radius: 5px;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn:hover {
+      background: rgba(124, 111, 255, 0.3);
+      color: #fff;
+    }
+
+    .copy-btn.copied {
+      background: rgba(0, 213, 189, 0.15);
+      border-color: rgba(0, 213, 189, 0.3);
+      color: #00D5BD;
+    }
+
+    /* ─── Page Break ───────────────────────────────────────────── */
+    .page-break {
+      page-break-before: always;
+    }
+
+    /* ─── Empty State ──────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: #8A8F98;
+      font-size: 12px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+    }
+
+    .empty-state-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+      opacity: 0.5;
+    }
+
+    /* ─── Sticky TOC ───────────────────────────────────────────── */
+    #toc {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 200px;
+      background: rgba(0, 0, 8, 0.96);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 80px 0 24px;
+      overflow-y: auto;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transform: translateX(0);
+      transition: transform 0.25s;
+    }
+
+    #toc.hidden {
+      transform: translateX(-100%);
+    }
+
+    .toc-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8A8F98;
+      padding: 0 16px 8px;
+      margin-top: 4px;
+    }
+
+    .toc-link {
+      display: block;
+      padding: 6px 16px;
+      font-size: 11px;
+      color: #8A8F98;
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      line-height: 1.3;
+    }
+
+    .toc-link:hover {
+      color: #FAFAFA;
+      background: rgba(255, 255, 255, 0.03);
+      border-left-color: rgba(124, 111, 255, 0.4);
+    }
+
+    .toc-link.active {
+      color: #7C6FFF;
+      border-left-color: #7C6FFF;
+      background: rgba(124, 111, 255, 0.06);
+    }
+
+    /* ─── TOC Toggle ───────────────────────────────────────────── */
+    #toc-toggle {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 100;
+      background: rgba(124, 111, 255, 0.12);
+      border: 1px solid rgba(124, 111, 255, 0.25);
+      color: #7C6FFF;
+      border-radius: 7px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s;
+    }
+
+    #toc-toggle:hover {
+      background: rgba(124, 111, 255, 0.22);
+    }
+
+    /* ─── Main Wrapper ─────────────────────────────────────────── */
+    #main {
+      margin-left: 200px;
+      transition: margin-left 0.25s;
+    }
+
+    #main.full {
+      margin-left: 0;
+    }
+
+    /* ─── Header ───────────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #0a0a18 0%, #000008 50%, #0d0b25 100%);
+      padding: 48px 48px 40px;
+      border-bottom: 1px solid rgba(124, 111, 255, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #7C6FFF, #00D5BD);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .logo-name {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .meta-block {
+      font-size: 11px;
+      color: #8A8F98;
+      line-height: 1.8;
+      text-align: right;
+    }
+
+    .meta-block span {
+      color: #7C6FFF;
+    }
+
+    .meta-block .meta-white {
+      color: #FAFAFA;
+    }
+
+    /* ─── Content ──────────────────────────────────────────────── */
+    .content {
+      padding: 36px 48px;
+      max-width: 1100px;
+    }
+
+    /* ─── Summary Cards ────────────────────────────────────────── */
+    .summary-card {
+      background: rgba(124, 111, 255, 0.05);
+      border: 1px solid rgba(124, 111, 255, 0.12);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .summary-card:hover {
+      border-color: rgba(124, 111, 255, 0.25);
+      background: rgba(124, 111, 255, 0.08);
+    }
+
+    .summary-val {
+      font-size: 32px;
+      font-weight: 900;
+      color: #FAFAFA;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .summary-lbl {
+      font-size: 10px;
+      color: #8A8F98;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    /* ─── Section Snapshot ─────────────────────────────────────── */
+    .snapshot-img-wrap {
+      overflow: hidden;
+      max-height: 560px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: #000;
+    }
+
+    .snapshot-img-wrap img {
+      width: 100%;
+      height: auto;
+      max-height: 560px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .snapshot-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #FAFAFA;
+      margin-bottom: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .snapshot-label::before {
+      content: '↕';
+      color: #7C6FFF;
+    }
+
+    /* ─── Typography Card ──────────────────────────────────────── */
+    .type-card {
+      padding: 14px 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: border-color 0.2s;
+    }
+
+    .type-card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .type-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .type-count {
+      font-size: 10px;
+      color: #8A8F98;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .type-count::before {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* ─── Color Card ───────────────────────────────────────────── */
+    .color-card {
+      padding: 12px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .color-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ─── Gradient swatch ──────────────────────────────────────── */
+    .grad-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+    }
+
+    .radius-demo {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      flex-shrink: 0;
+    }
+
+    /* ─── Component Preview ────────────────────────────────────── */
+    .component-row {
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .component-preview-box {
+      flex: 0 0 160px;
+      text-align: center;
+    }
+
+    .component-css-box {
+      flex: 1;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #8A8F98;
+      line-height: 1.8;
+    }
+
+    /* ─── Text Copy ────────────────────────────────────────────── */
+    .text-copy-card {
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .text-copy-content {
+      margin: 0;
+      background: transparent;
+      border: none;
+      padding: 0;
+      white-space: pre-wrap;
+      font-family: 'Inter', sans-serif;
+      color: #FAFAFA;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    /* ─── LLM Prompt Box ───────────────────────────────────────── */
+    .llm-box {
+      padding: 18px;
+      border-left: 3px solid #00D5BD;
+      border-radius: 0 8px 8px 0;
+      background: rgba(0, 213, 189, 0.04);
+      border-top: 1px solid rgba(0, 213, 189, 0.15);
+      border-right: 1px solid rgba(0, 213, 189, 0.15);
+      border-bottom: 1px solid rgba(0, 213, 189, 0.15);
+    }
+
+    .llm-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #00D5BD;
+      margin-bottom: 10px;
+    }
+
+    .llm-pre {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: #C8CCD4;
+      font-size: 11px;
+    }
+
+    /* ─── Assets Grid ──────────────────────────────────────────── */
+    .svg-chip {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      color: #FAFAFA;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .svg-chip:hover {
+      border-color: rgba(124, 111, 255, 0.4);
+      background: rgba(124, 111, 255, 0.06);
+    }
+
+    /* ─── Print ────────────────────────────────────────────────── */
+    @media print {
+
+      #toc,
+      #toc-toggle {
+        display: none !important;
+      }
+
+      #main {
+        margin-left: 0 !important;
+      }
+
+      .header {
+        position: static;
+      }
+
+      th {
+        position: static;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      .surface:hover {
+        border-color: rgba(255, 255, 255, 0.08);
+      }
+
+      .copy-btn {
+        display: none;
+      }
+
+      body {
+        background: #000008 !important;
+        -webkit-print-color-adjust: exact;
+      }
+    }
+
+    /* ─── Scrollbar ────────────────────────────────────────────── */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    /* ─── Layout divider ───────────────────────────────────────── */
+    .two-col {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .two-col>div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .col-header-sep {
+      color: #FAFAFA;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── TOC Toggle ────────────────────────────────────────────── -->
+  <button id="toc-toggle" title="Toggle navigation">☰</button>
+
+  <!-- ── Sticky TOC ────────────────────────────────────────────── -->
+  <nav id="toc" aria-label="Table of contents">
+    <div class="toc-label">Sections</div>
+    <a class="toc-link" href="#sec-summary">📊 Summary</a>
+    <a class="toc-link" href="#sec-pages">📄 Pages</a>
+    <a class="toc-link" href="#sec-screenshot">🖼 Screenshot</a>
+    <a class="toc-link" href="#sec-snapshots">📜 Snapshots</a>
+    <a class="toc-link" href="#sec-colors">🎨 Colors</a>
+    <a class="toc-link" href="#sec-typography">🔤 Typography</a>
+    <a class="toc-link" href="#sec-spacing">📐 Spacing</a>
+    <a class="toc-link" href="#sec-motion">🎬 Motion</a>
+    <a class="toc-link" href="#sec-components">🧩 Components</a>
+    <a class="toc-link" href="#sec-advanced">✨ Advanced</a>
+    <a class="toc-link" href="#sec-assets">💎 Assets</a>
+    <a class="toc-link" href="#sec-textcopy">📝 Text Copy</a>
+    <a class="toc-link" href="#sec-tailwind">🛠 Tailwind</a>
+    <a class="toc-link" href="#sec-cssvars">🎯 CSS Vars</a>
+    <a class="toc-link" href="#sec-llm">🤖 LLM Prompt</a>
+  </nav>
+
+  <!-- ── Main ──────────────────────────────────────────────────── -->
+  <div id="main">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-inner">
+        <div>
+          <div class="logo">
+            <div class="logo-mark">W</div>
+            <span class="logo-name">WEBIMIC</span>
+          </div>
+          <h1>Doc A — Observed Design Specification</h1>
+          <p class="subtle" style="font-size:13px;margin:0;max-width:560px;line-height:1.6;">
+            A pixel-faithful extraction of the live website's design tokens. Every value below was captured directly
+            from the rendered DOM and the raster screenshot using k-means + computed style sampling. Hand this document
+            (or the matching <code>llm-context.json</code>) to any LLM and it can reconstruct a 1:1 visual mimic.
+          </p>
+        </div>
+        <div class="mono meta-block">
+          <div>Job&nbsp;<span>{{JOB_ID}}</span></div>
+          <div>Source&nbsp;<span class="meta-white">{{PAGE_URL}}</span></div>
+          <div>Pages&nbsp;<span class="meta-white">{{PAGE_COUNT}}</span></div>
+          <div>Generated&nbsp;{{GENERATED_AT}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── SUMMARY ──────────────────────────────────────────── -->
+      <div id="sec-summary" style="margin-bottom:32px;">
+        <div class="surface" style="padding:20px;border-left:3px solid #7C6FFF;">
+          <div class="section-title">📊 Token Summary</div>
+          <div id="summary-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;"></div>
+        </div>
+      </div>
+
+      <!-- ── PAGE INVENTORY ───────────────────────────────────── -->
+      <div id="sec-pages" style="margin-bottom:32px;">
+        <div class="section-title">📄 Page Inventory</div>
+        <div class="surface" style="overflow:hidden;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>URL</th>
+                <th>Title</th>
+                <th>Links Found</th>
+                <th>Sections Captured</th>
+                <th>Screenshot</th>
+              </tr>
+            </thead>
+            <tbody id="pages-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── REFERENCE SCREENSHOTS ─────────────────────────────── -->
+      <div id="sec-screenshot" style="margin-bottom:36px;">
+        <div class="section-title">🖼 Reference Screenshots</div>
+        <div id="screenshots-list" style="display:flex;flex-direction:column;gap:28px;"></div>
+      </div>
+
+      <!-- ── SECTION SNAPSHOTS ─────────────────────────────────── -->
+      <div id="sec-snapshots" class="page-break" style="margin-bottom:36px;display:none;">
+        <div class="section-title">📜 Section Snapshots — Per-Viewport Scroll Capture</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 16px;line-height:1.6;">The page was scrolled one viewport at
+          a time and a screenshot taken at each stop. This reveals lazy-mounted sections, sticky bars on scroll, and
+          reveal-on-view animations that a single top-of-page shot misses.</p>
+        <div id="sections-list" style="display:flex;flex-direction:column;gap:28px;"></div>
+      </div>
+
+      <!-- ── COLORS ────────────────────────────────────────────── -->
+      <div id="sec-colors" class="page-break" style="margin-bottom:36px;">
+        <div class="section-title">🎨 Color Palette — Full Token Set</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 16px;line-height:1.6;">Extracted via k-means clustering of
+          the rendered page pixels. Frequency = share of sampled pixels. WCAG contrast measured against pure white and
+          pure black using the standard relative luminance formula.</p>
+        <div id="colors-grid" class="colors-grid"></div>
+      </div>
+
+      <!-- ── TYPOGRAPHY ───────────────────────────────────────── -->
+      <div id="sec-typography" class="page-break" style="margin-bottom:36px;">
+        <div class="section-title">🔤 Typography Hierarchy — Full Token Set</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 16px;line-height:1.6;">Every unique combination of tag ×
+          font-family × size × weight observed in the page, ranked by heading priority then frequency. Each row contains
+          everything an LLM needs to recreate the type system.</p>
+        <div id="typography-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <!-- ── SPACING ───────────────────────────────────────────── -->
+      <div id="sec-spacing" style="margin-bottom:36px;">
+        <div class="section-title">📐 Spacing Scale — Full Token Set</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 16px;line-height:1.6;">Values rounded to the nearest 4px
+          after sampling margin/padding/gap across every captured element. <code>usageCount</code> is how often the raw
+          value appeared in the source DOM.</p>
+        <div class="surface" style="overflow:hidden;">
+          <table>
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>px</th>
+                <th>rem</th>
+                <th>Category</th>
+                <th>Usage</th>
+                <th>Visual</th>
+              </tr>
+            </thead>
+            <tbody id="spacing-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── MOTION ────────────────────────────────────────────── -->
+      <div id="sec-motion" style="margin-bottom:36px;">
+        <div class="section-title">🎬 Motion &amp; Transitions — Full Token Set</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 16px;line-height:1.6;">Every distinct CSS transition and
+          keyframe animation found in the page's computed styles, with the properties they animate.</p>
+        <div class="surface" style="overflow:hidden;">
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Trigger</th>
+                <th>Duration</th>
+                <th>Easing</th>
+                <th>Properties</th>
+                <th>Target</th>
+              </tr>
+            </thead>
+            <tbody id="animations-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── COMPONENTS ───────────────────────────────────────── -->
+      <div id="sec-components" class="page-break" style="margin-bottom:36px;">
+        <div class="section-title">🧩 Component Styles — UI Elements</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 16px;line-height:1.6;">Specific computed styles for buttons
+          and interactive elements, capturing their true padding, border-radius, box-shadow, and gradients.</p>
+        <div id="components-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+
+      <!-- ── ADVANCED TOKENS ───────────────────────────────────── -->
+      <div id="sec-advanced" class="page-break" style="margin-bottom:36px;">
+        <div class="section-title">✨ Advanced Tokens — Gradients, Radii &amp; Layout</div>
+
+        <div class="two-col">
+          <div>
+            <div class="col-header-sep">Gradients</div>
+            <div id="gradients-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+          <div>
+            <div class="col-header-sep">Border Radii</div>
+            <div id="radii-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+        </div>
+
+        <div class="col-header-sep" style="margin-bottom:12px;">Layout &amp; Grid Constraints</div>
+        <div class="surface" style="overflow:hidden;margin-bottom:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Spec / Element</th>
+                <th>Context</th>
+              </tr>
+            </thead>
+            <tbody id="layout-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── ASSETS ────────────────────────────────────────────── -->
+      <div id="sec-assets" class="page-break" style="margin-bottom:36px;">
+        <div class="section-title">💎 SVG Assets &amp; Icons</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 16px;line-height:1.6;">Inline SVGs extracted directly from
+          the DOM.</p>
+        <div id="assets-grid" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
+      </div>
+
+      <!-- ── TEXT COPY ─────────────────────────────────────────── -->
+      <div id="sec-textcopy" class="page-break" style="margin-bottom:36px;">
+        <div class="section-title">📝 Section Text Copy</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 16px;line-height:1.6;">Actual body copy extracted per
+          section, ready to be injected into the redesigned layout.</p>
+        <div id="text-copy-list" style="display:flex;flex-direction:column;gap:16px;"></div>
+      </div>
+
+      <!-- ── TAILWIND CONFIG ───────────────────────────────────── -->
+      <div id="sec-tailwind" class="page-break" style="margin-bottom:36px;">
+        <div class="section-title">🛠 Ready-to-Paste Tailwind v3 Config</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 12px;line-height:1.6;">Drop this <code>theme.extend</code>
+          block into <code>tailwind.config.js</code> for an instant visual match.</p>
+        <div class="code-wrap">
+          <pre id="tailwind-config"></pre>
+          <button class="copy-btn" data-target="tailwind-config">copy</button>
+        </div>
+      </div>
+
+      <!-- ── CSS VARIABLES ─────────────────────────────────────── -->
+      <div id="sec-cssvars" style="margin-bottom:36px;">
+        <div class="section-title">🎯 CSS Custom Properties</div>
+        <p class="subtle" style="font-size:12px;margin:0 0 12px;line-height:1.6;">Paste into <code>:root</code> of your
+          global stylesheet. Use as <code>color: var(--color-brand)</code>.</p>
+        <div class="code-wrap">
+          <pre id="css-vars"></pre>
+          <button class="copy-btn" data-target="css-vars">copy</button>
+        </div>
+      </div>
+
+      <!-- ── LLM PROMPT ────────────────────────────────────────── -->
+      <div id="sec-llm" style="margin-bottom:36px;">
+        <div class="llm-box">
+          <div class="llm-label">🤖 Suggested LLM Prompt</div>
+          <div class="code-wrap">
+            <pre id="llm-prompt" class="llm-pre"></pre>
+            <button class="copy-btn" data-target="llm-prompt">copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div
+        style="margin-top:48px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;font-size:11px;color:#8A8F98;">
+        Generated by <span style="color:#7C6FFF;font-weight:700;">Webimic</span> — Reverse-engineering the visual web. •
+        {{GENERATED_AT}}
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <!-- Payload injected by docA.js (base64-encoded)               -->
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <script id="payload-data" type="application/json">__PAYLOAD_B64__</script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── 1. PAYLOAD DECODE ──────────────────────────────────────
+         FIX: replaced deprecated escape() with TextDecoder for
+         correct UTF-8 handling across all character ranges.
+      ─────────────────────────────────────────────────────────── */
+      const b64 = document.getElementById('payload-data').textContent.trim();
+      let payload = {};
+
+      try {
+        const binStr = atob(b64);
+        const bytes = new Uint8Array(binStr.length);
+        for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+        payload = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+      } catch (e) {
+        document.body.insertAdjacentHTML('afterbegin',
+          '<div style="padding:20px;color:#FF5F57;font-family:monospace;font-size:13px;">'
+          + '⚠ Payload parse error: ' + e.message + '</div>');
+        return;
+      }
+
+      /* ── 2. DESTRUCTURE WITH SAFE DEFAULTS ──────────────────────
+         FIX: every array defaults to [] so .length never throws
+         on undefined payload keys.
+      ─────────────────────────────────────────────────────────── */
+      const {
+        colors = [],
+        typography = [],
+        spacing = [],
+        animations = [],
+        gradients = [],
+        borderRadii = [],
+        layoutSpecs = [],
+        components = [],
+        assets = { images: [], svgs: [] },
+        textCopy = [],
+        sectionStyles = [],
+        pages = [],
+        tailwindConfig = '',
+        cssVars = '',
+        llmPrompt = ''
+      } = payload;
+
+      /* ── 3. HELPERS ──────────────────────────────────────────── */
+
+      /** Safely escape HTML to prevent attribute/tag injection. */
+      function esc(str) {
+        return String(str ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      /** Render an empty-state block inside a container. */
+      function emptyState(icon, msg) {
+        return `<div class="empty-state"><div class="empty-state-icon">${icon}</div>${msg}</div>`;
+      }
+
+      /** WCAG pill helper. */
+      function wcagPill(label, val) {
+        const v = String(val ?? 'N/A');
+        const cls = (v.startsWith('AAA') || v.startsWith('AA ') || v === 'AA')
+          ? 'pill-ok'
+          : (v === 'FAIL' || v === 'N/A') ? 'pill-fail' : 'pill-warn';
+        return `<span class="tag-chip ${cls}">${esc(label)} ${esc(v)}</span>`;
+      }
+
+      /* ── 4. SUMMARY ─────────────────────────────────────────── */
+      const sumGrid = document.getElementById('summary-grid');
+      const summaryItems = [
+        { label: 'Colors', val: colors.length },
+        { label: 'Type styles', val: typography.length },
+        { label: 'Spacing tokens', val: spacing.length },
+        { label: 'Motion rules', val: animations.length },
+      ];
+      sumGrid.innerHTML = summaryItems.map(s =>
+        `<div class="summary-card">
+      <div class="summary-val">${s.val}</div>
+      <div class="summary-lbl">${esc(s.label)}</div>
+    </div>`
+      ).join('');
+
+      /* ── 5. PAGE INVENTORY ──────────────────────────────────── */
+      const pBody = document.getElementById('pages-body');
+      if (pages.length) {
+        pages.forEach((p, i) => {
+          const secCount = Array.isArray(p.sectionShotUrls) ? p.sectionShotUrls.length : 0;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+        <td class="mono">${i + 1}</td>
+        <td class="mono" style="color:#7C6FFF;word-break:break-all;">${esc(p.url || '')}</td>
+        <td>${esc(p.title || '')}</td>
+        <td class="mono">${p.linkCount ?? '—'}</td>
+        <td class="mono"><span class="tag-chip pill-ok">${secCount}</span></td>
+        <td>${p.screenshotUrl
+              ? `<img src="${esc(p.screenshotUrl)}" style="width:120px;height:auto;border-radius:4px;display:block;" alt="Page ${i + 1} screenshot"/>`
+              : '—'}
+            ${p.sectionShotUrls && p.sectionShotUrls.length > 0 ? `
+              <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; max-width:240px;">
+                ${p.sectionShotUrls.map(u => `<img src="https://wsrv.nl/?url=${encodeURIComponent(u.url)}&w=60" style="width:60px;height:auto;border-radius:2px;" alt="Section shot"/>`).join('')}
+              </div>
+            ` : ''}
+        </td>`;
+          pBody.appendChild(tr);
+
+          if (p.links && p.links.length > 0) {
+            const trLinks = document.createElement('tr');
+            trLinks.innerHTML = `
+              <td colspan="6" style="padding-top: 4px; padding-bottom: 12px; border-top: none;">
+                <div style="font-size: 11px; color: #8A8F98; margin-bottom: 4px;">Internal Links (${p.links.length}):</div>
+                <div class="mono" style="font-size: 10px; color: #00D5BD; word-break: break-all;">
+                  ${p.links.map(l => esc(l)).join('<br>')}
+                </div>
+              </td>
+            `;
+            pBody.appendChild(trLinks);
+          }
+        });
+      } else {
+        pBody.innerHTML = `<tr><td colspan="6">${emptyState('📄', 'No pages captured.')}</td></tr>`;
+      }
+
+      /* ── 6. SECTION SNAPSHOTS ───────────────────────────────── */
+      const snapWrapper = document.getElementById('sec-snapshots');
+      const snapList = document.getElementById('sections-list');
+      const pagesWithSections = pages.filter(p =>
+        Array.isArray(p.sectionShotUrls) && p.sectionShotUrls.length > 0
+      );
+
+      if (pagesWithSections.length > 0) {
+        snapWrapper.style.display = 'block';
+        pagesWithSections.forEach((p, pi) => {
+          const pageEl = document.createElement('div');
+          const header = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap;">
+          <span class="mono" style="font-size:11px;font-weight:700;color:#7C6FFF;">
+            PAGE ${pi + 1} · ${p.sectionShotUrls.length} sections
+          </span>
+          <span class="mono subtle" style="font-size:10px;word-break:break-all;max-width:60%;text-align:right;">${esc(p.url || '')}</span>
+        </div>`;
+          const shots = p.sectionShotUrls.map(s => {
+            const secStyle = sectionStyles.find(ss => ss.sectionIndex === s.index) || { colors: [], typography: [], gradients: [] };
+            return `
+        <div style="margin-bottom:24px;page-break-inside:avoid;">
+          <div class="snapshot-label">Page ${pi + 1} - Section ${s.index + 1} (Scroll Y: ${esc(String(s.scrollY))}px)</div>
+          <div class="snapshot-img-wrap">
+            <img src="${esc(s.url)}" alt="Section ${s.index + 1}" loading="lazy" />
+          </div>
+          <div style="margin-top:8px; padding:8px; background:#1C1D21; border-radius:4px;">
+            <div style="font-size:11px; color:#8A8F98; margin-bottom:4px;">Section Styles:</div>
+            <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
+              ${secStyle.colors.map(c => `<div style="width:16px;height:16px;background:${c};border-radius:2px;" title="${c}"></div>`).join('')}
+            </div>
+            <div style="font-size:10px; color:#00D5BD;">
+              ${secStyle.typography.map(t => `<span>${esc(t)}</span>`).join(', ')}
+            </div>
+            <div style="font-size:10px; color:#7C6FFF; margin-top:2px;">
+              ${secStyle.gradients.map(g => `<span title="${esc(g)}">Gradient</span>`).join(', ')}
+            </div>
+          </div>
+        </div>`;
+          }).join('');
+          pageEl.innerHTML = header + shots;
+          snapList.appendChild(pageEl);
+        });
+      }
+
+      /* ── 7. REFERENCE SCREENSHOTS ──────────────────────────── */
+      const screenshotSection = document.getElementById('sec-screenshot');
+      const screenshotsList = document.getElementById('screenshots-list');
+      
+      if (pages.length) {
+        pages.forEach((p, i) => {
+          if (p.screenshotUrl) {
+            const el = document.createElement('div');
+            el.style.marginBottom = '24px';
+            el.style.pageBreakInside = 'avoid';
+            el.innerHTML = `
+              <div class="snapshot-label">Page ${i + 1}: ${esc(p.title || p.url || '')}</div>
+              <div class="snapshot-img-wrap">
+                <img src="${esc(p.screenshotUrl)}" alt="Page ${i + 1} screenshot" loading="lazy" style="width:100%; height:auto; object-fit:contain;" />
+              </div>
+            `;
+            screenshotsList.appendChild(el);
+          }
+        });
+      } else {
+        screenshotSection.style.display = 'none';
+      }
+
+      /* ── 8. COLORS ──────────────────────────────────────────── */
+      const cGrid = document.getElementById('colors-grid');
+      if (colors.length) {
+        colors.forEach(c => {
+          const wcagW = c.wcagContrast?.onWhite || 'N/A';
+          const wcagB = c.wcagContrast?.onBlack || 'N/A';
+          const el = document.createElement('div');
+          el.className = 'color-card';
+          el.innerHTML = `
+        <div class="swatch" style="background:${esc(c.hex)};"></div>
+        <div>
+          <div class="mono" style="font-size:12px;font-weight:700;">${esc(c.hex)}</div>
+          <div class="mono subtle" style="font-size:10px;">rgb(${c.rgb?.r ?? '?'}, ${c.rgb?.g ?? '?'}, ${c.rgb?.b ?? '?'})</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          <span class="tag-chip" style="background:rgba(124,111,255,0.12);color:#7C6FFF;">${esc(c.role || 'neutral')}</span>
+          <span class="tag-chip subtle" style="background:rgba(255,255,255,0.04);">${((c.frequency || 0) * 100).toFixed(1)}%</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          ${wcagPill('on #fff', wcagW)}
+          ${wcagPill('on #000', wcagB)}
+        </div>`;
+          cGrid.appendChild(el);
+        });
+      } else {
+        cGrid.innerHTML = emptyState('🎨', 'No colors extracted.');
+      }
+
+      /* ── 9. TYPOGRAPHY ──────────────────────────────────────── */
+      const tList = document.getElementById('typography-list');
+      if (typography.length) {
+        typography.forEach(t => {
+          /* FIX: sanitize fontFamily before injecting into style attr;
+             quotes in the value would break the attribute string. */
+          const safeFamily = String(t.fontFamily || 'sans-serif').replace(/"/g, "'");
+          const safeSample = esc((t.sampleText || 'The quick brown fox jumps over the lazy dog.').slice(0, 110));
+          const el = document.createElement('div');
+          el.className = 'type-card';
+          el.innerHTML = `
+        <div class="type-meta">
+          <span class="mono" style="font-size:11px;font-weight:700;color:#7C6FFF;text-transform:uppercase;">${esc(t.tag)}</span>
+          <span class="mono subtle" style="font-size:10px;">
+            ${esc(t.fontFamilyClean || t.fontFamily)} · ${esc(t.fontSize)} · ${esc(String(t.fontWeight))} · lh:${esc(t.lineHeight)} · ls:${esc(t.letterSpacing)} · ${esc(t.textTransform)}
+          </span>
+        </div>
+        <div style="font-family:${safeFamily};font-size:clamp(13px,${esc(t.fontSize)},28px);font-weight:${esc(String(t.fontWeight))};line-height:${esc(t.lineHeight)};letter-spacing:${esc(t.letterSpacing)};text-transform:${esc(t.textTransform)};color:#FAFAFA;overflow:hidden;text-overflow:ellipsis;">${safeSample}</div>
+        <div class="type-count">Observed ${t.count || 1}×</div>`;
+          tList.appendChild(el);
+        });
+      } else {
+        tList.innerHTML = emptyState('🔤', 'No typography extracted.');
+      }
+
+      /* ── 10. SPACING ────────────────────────────────────────── */
+      const sBody = document.getElementById('spacing-body');
+      if (spacing.length) {
+        spacing.forEach(s => {
+          const rem = (s.numericValue / 16).toFixed(3) + 'rem';
+          const width = Math.min(s.numericValue * 1.5, 220);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+        <td class="mono">${esc(s.name)}</td>
+        <td class="mono">${esc(s.value)}</td>
+        <td class="mono subtle">${esc(rem)}</td>
+        <td><span class="tag-chip pill-ok">${esc(s.category)}</span></td>
+        <td class="mono">${s.usageCount ?? '—'}</td>
+        <td><div style="height:10px;width:${width}px;background:rgba(124,111,255,0.4);border-radius:99px;max-width:220px;"></div></td>`;
+          sBody.appendChild(tr);
+        });
+      } else {
+        sBody.innerHTML = `<tr><td colspan="6">${emptyState('📐', 'No spacing tokens extracted.')}</td></tr>`;
+      }
+
+      /* ── 11. ANIMATIONS ─────────────────────────────────────── */
+      const aBody = document.getElementById('animations-body');
+      if (animations.length) {
+        animations.forEach(a => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+        <td><span class="tag-chip" style="background:rgba(124,111,255,0.12);color:#7C6FFF;">${esc(a.type || 'transition')}</span></td>
+        <td class="mono">${esc(a.trigger)}</td>
+        <td class="mono" style="color:#00D5BD;">${esc(a.duration)}&nbsp;<span class="subtle">(${esc(String(a.durationMs))}ms)</span></td>
+        <td class="mono subtle">${esc(a.easing)}</td>
+        <td class="mono subtle">${esc((a.properties || []).join(', '))}</td>
+        <td class="mono subtle">${esc(a.target)}</td>`;
+          aBody.appendChild(tr);
+        });
+      } else {
+        aBody.innerHTML = `<tr><td colspan="6">${emptyState('🎬', 'No motion tokens extracted.')}</td></tr>`;
+      }
+
+      /* ── 12. COMPONENTS ─────────────────────────────────────── */
+      const cList = document.getElementById('components-list');
+      if (components.length) {
+        components.forEach(c => {
+          const cssObj = c.css || {};
+          /* FIX: build CSS string from trusted object keys; sanitize values
+             before inserting into innerHTML to prevent attribute breakage. */
+          const cssLines = Object.entries(cssObj)
+            .filter(([, v]) => v && v !== 'none' && v !== '0px')
+            .map(([k, v]) => `<span style="color:#7C6FFF;">${esc(k)}</span>: ${esc(v)};`)
+            .join('<br>');
+
+          /* Build a safe style string for the live preview box */
+          const previewStyle = [
+            cssObj.padding ? `padding:${esc(cssObj.padding)}` : '',
+            cssObj.backgroundColor ? `background:${esc(cssObj.backgroundColor)}` : '',
+            cssObj.backgroundImage && cssObj.backgroundImage !== 'none'
+              ? `background-image:${esc(cssObj.backgroundImage)}` : '',
+            cssObj.color ? `color:${esc(cssObj.color)}` : '',
+            cssObj.borderRadius ? `border-radius:${esc(cssObj.borderRadius)}` : '',
+            cssObj.boxShadow && cssObj.boxShadow !== 'none'
+              ? `box-shadow:${esc(cssObj.boxShadow)}` : '',
+            cssObj.border && cssObj.border !== 'none'
+              ? `border:${esc(cssObj.border)}` : '',
+            cssObj.fontFamily ? `font-family:${esc(cssObj.fontFamily).replace(/"/g, "'")}` : '',
+            cssObj.fontSize ? `font-size:${esc(cssObj.fontSize)}` : '',
+            cssObj.fontWeight ? `font-weight:${esc(String(cssObj.fontWeight))}` : '',
+          ].filter(Boolean).join(';');
+
+          const el = document.createElement('div');
+          el.className = 'component-row';
+          el.innerHTML = `
+        <div class="component-preview-box">
+          <div style="${previewStyle};display:inline-block;">${esc(c.sampleText || 'Button')}</div>
+        </div>
+        <div class="component-css-box">${cssLines}</div>
+        <div class="mono" style="color:#00D5BD;font-size:10px;white-space:nowrap;">Observed ${c.usageCount ?? 1}×</div>`;
+          cList.appendChild(el);
+        });
+      } else {
+        cList.innerHTML = emptyState('🧩', 'No components extracted.');
+      }
+
+      /* ── 13. GRADIENTS ──────────────────────────────────────── */
+      const gList = document.getElementById('gradients-list');
+      if (gradients.length) {
+        gradients.forEach(g => {
+          gList.insertAdjacentHTML('beforeend', `
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="grad-swatch" style="background:${esc(g.value)};"></div>
+          <div class="mono subtle" style="font-size:9px;word-break:break-all;flex:1;">${esc(g.value)}</div>
+        </div>`);
+        });
+      } else {
+        gList.innerHTML = emptyState('✨', 'No gradients extracted.');
+      }
+
+      /* ── 14. BORDER RADII ───────────────────────────────────── */
+      const rList = document.getElementById('radii-list');
+      if (borderRadii.length) {
+        borderRadii.forEach(r => {
+          rList.insertAdjacentHTML('beforeend', `
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="radius-demo" style="border-radius:${esc(r.value)};"></div>
+          <div class="mono subtle" style="font-size:11px;">${esc(r.value)}</div>
+        </div>`);
+        });
+      } else {
+        rList.innerHTML = emptyState('⬜', 'No border radii extracted.');
+      }
+
+      /* ── 15. LAYOUT SPECS ───────────────────────────────────── */
+      const lBody = document.getElementById('layout-body');
+      if (layoutSpecs.length) {
+        layoutSpecs.forEach(l => {
+          const spec = l.type === 'z-index' ? esc(l.element) : esc(l.template || l.value);
+          const ctx = l.type === 'z-index'
+            ? `z-index: ${esc(String(l.value))} (${esc(l.position)})`
+            : `Observed ${l.usageCount ?? '?'}×`;
+          lBody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td><span class="tag-chip pill-ok">${esc(l.type)}</span></td>
+          <td class="mono subtle">${spec}</td>
+          <td class="mono subtle">${ctx}</td>
+        </tr>`);
+        });
+      } else {
+        lBody.innerHTML = `<tr><td colspan="3">${emptyState('📐', 'No layout constraints extracted.')}</td></tr>`;
+      }
+
+      /* ── 16. ASSETS ─────────────────────────────────────────── */
+      const asGrid = document.getElementById('assets-grid');
+      const svgs = assets.svgs || [];
+      const images = assets.images || [];
+      if (svgs.length || images.length) {
+        /* SVG markup is trusted DOM content extracted by the tool */
+        svgs.forEach(svg => {
+          asGrid.insertAdjacentHTML('beforeend', `<div class="svg-chip" style="overflow:hidden;" title="Inline SVG">${svg}</div>`);
+        });
+        images.forEach(img => {
+          asGrid.insertAdjacentHTML('beforeend', `<div class="svg-chip" style="padding:0; overflow:hidden;" title="Image Asset"><img src="https://wsrv.nl/?url=${encodeURIComponent(img.src)}&w=200" alt="${esc(img.alt || '')}" style="width:100%; height:100%; object-fit:contain;" /></div>`);
+        });
+      } else {
+        asGrid.innerHTML = emptyState('💎', 'No assets extracted.');
+      }
+
+      /* ── 17. TEXT COPY ──────────────────────────────────────── */
+      const tcList = document.getElementById('text-copy-list');
+      if (textCopy.length) {
+        [...textCopy]
+          .sort((a, b) => a.sectionIndex - b.sectionIndex)
+          .forEach(tc => {
+            /* FIX: was join('\\n\\n') which produced literal \n chars.
+               Now joins with a real newline character. */
+            const joined = (tc.texts || []).join('\n\n');
+            const el = document.createElement('div');
+            el.className = 'text-copy-card';
+            el.innerHTML = `
+          <div class="mono" style="font-size:11px;font-weight:700;color:#7C6FFF;margin-bottom:8px;">
+            Section ${Number(tc.sectionIndex) + 1}
+          </div>`;
+            /* Use textContent to inject copy safely — no XSS possible */
+            const pre = document.createElement('pre');
+            pre.className = 'text-copy-content';
+            pre.textContent = joined;
+            el.appendChild(pre);
+            tcList.appendChild(el);
+          });
+      } else {
+        tcList.innerHTML = emptyState('📝', 'No section text extracted.');
+      }
+
+      /* ── 18. TAILWIND / CSS VARS / LLM PROMPT ──────────────── */
+      /* textContent is correct here — no HTML needed, just raw text */
+      document.getElementById('tailwind-config').textContent = tailwindConfig || '// no tokens';
+      document.getElementById('css-vars').textContent = cssVars || '/* no tokens */';
+      document.getElementById('llm-prompt').textContent = llmPrompt || '';
+
+      /* ── 19. COPY BUTTONS ───────────────────────────────────── */
+      document.querySelectorAll('.copy-btn[data-target]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = document.getElementById(btn.dataset.target);
+          if (!target) return;
+          const text = target.textContent;
+          navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = 'copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+              btn.textContent = 'copy';
+              btn.classList.remove('copied');
+            }, 1800);
+          }).catch(() => {
+            /* Fallback for environments without clipboard API */
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            btn.textContent = 'copied!';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1800);
+          });
+        });
+      });
+
+      /* ── 20. TOC TOGGLE ─────────────────────────────────────── */
+      const toc = document.getElementById('toc');
+      const main = document.getElementById('main');
+      const tocToggle = document.getElementById('toc-toggle');
+      let tocOpen = true;
+
+      tocToggle.addEventListener('click', () => {
+        tocOpen = !tocOpen;
+        toc.classList.toggle('hidden', !tocOpen);
+        main.classList.toggle('full', !tocOpen);
+        tocToggle.textContent = tocOpen ? '☰' : '›';
+      });
+
+      /* ── 21. ACTIVE TOC LINK on scroll ──────────────────────── */
+      const sections = document.querySelectorAll('[id^="sec-"]');
+      const tocLinks = document.querySelectorAll('.toc-link');
+
+      const tocObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            tocLinks.forEach(l => l.classList.remove('active'));
+            const link = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -60% 0px' });
+
+      sections.forEach(s => tocObserver.observe(s));
+
+    })();
+  </script>
+</body>
+
+</html>
