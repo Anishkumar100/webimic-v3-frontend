@@ -1,9 +1,0 @@
-Videos used and the images that are animated to get the video
-
-Hero section images used in the video
-Webimic Dashboard Overview .jpeg
-Reverse‑Engineering the Visual Web.jpeg
-
-The AI Vibe‑Coding Loop images usedin the video
-AI Vibe‑Coding Loop.jpeg
-Instant Scaffolding Code Editor.jpeg
